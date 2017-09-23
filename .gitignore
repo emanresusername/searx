@@ -1,0 +1,7 @@
+.ensime*
+target/
+.DS_Store
+nohup.out
+/ensime.sbt
+/.idea/
+/.sbt-hydra-history
