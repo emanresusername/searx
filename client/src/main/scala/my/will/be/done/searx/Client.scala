@@ -1,13 +1,13 @@
 package my.will.be.done.searx.client
 
 import monix.execution.Scheduler
-import my.will.be.done.searx.model.Search
+import my.will.be.done.searx.model._
 import io.circe.parser.decode
 import io.circe.generic.extras.Configuration
 import io.circe.generic.extras.auto._
 import scala.concurrent.Future
 import fr.hmil.roshttp.HttpRequest
-import fr.hmil.roshttp.body.URLEncodedBody
+import fr.hmil.roshttp.body.{BodyPart, URLEncodedBody}
 
 class Client(url: String)(implicit val scheduler: Scheduler) {
   implicit val config = Configuration.default.withSnakeCaseKeys.withDiscriminator("type")
@@ -19,29 +19,36 @@ class Client(url: String)(implicit val scheduler: Scheduler) {
     }
   }
 
-  def search(
-    query: String,
-    categorys: Seq[String] = Nil,
-    engines: Seq[String] = Nil,
-    language: Option[String] = None,
-    pageNumber: Option[Int] = None,
-    timeRange: Option[String] = None
-  ): Future[Search] = {
-    val body = URLEncodedBody(Seq(
-      Option("q" → query),
-      Option("format" → "json"),
-      seqParam(categorys).map("categories" → _),
-      seqParam(engines).map("engines" → _),
-      language.map("lang" → _),
-      pageNumber.map("pageno" → _.toString),
-      timeRange.map("time_range" → _)
-    ).flatten:_*)
+  def queryBody(query: Query): BodyPart = {
+    URLEncodedBody(
+      Seq(
+        Option("q" → query.query),
+        Option("format" → "json"),
+        seqParam(query.categorys).map("categories" → _),
+        seqParam(query.engines).map("engines" → _),
+        query.language.map("lang" → _),
+        query.pageNumber.map("pageno" → _.toString),
+        query.timeRange.map("time_range" → _)
+      ).flatten:_*
+    )
+  }
 
+  def search(query: String): Future[Search] = {
+    search(Query(query = query))
+  }
+
+  def search(query: Query): Future[Search] = {
     for {
-      response ← HttpRequest(url).post(body)
+      response ← HttpRequest(url).post(queryBody(query))
       search ← decode[Search](response.body).fold(Future.failed, Future.successful)
     } yield {
       search
     }
+  }
+}
+
+object Client {
+  def search(query: String, url: String = "https://searx.tk")(implicit scheduler: Scheduler): Future[Search] = {
+    new Client(url).search(query)
   }
 }
