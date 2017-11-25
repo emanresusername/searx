@@ -9,7 +9,7 @@ import scala.concurrent.Future
 import fr.hmil.roshttp.HttpRequest
 import fr.hmil.roshttp.body.{BodyPart, URLEncodedBody}
 
-class Client(url: String)(implicit val scheduler: Scheduler) {
+case class Client(url: String)(implicit val scheduler: Scheduler) {
   implicit val config = Configuration.default.withSnakeCaseKeys.withDiscriminator("type")
 
   private[this] def seqParam(elems: Seq[String]): Option[String] = {
