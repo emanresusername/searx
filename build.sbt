@@ -1,4 +1,4 @@
-scalaVersion in ThisBuild := "2.12.3"
+scalaVersion in ThisBuild := "2.12.4"
 scalafmtOnCompile in ThisBuild := true
 
 lazy val commonSettings = Seq(
@@ -25,7 +25,7 @@ lazy val client = crossProject
     commonSettings,
     libraryDependencies ++= {
       Seq(
-        "fr.hmil" %%% "roshttp" % "2.0.2",
+        "fr.hmil" %%% "roshttp" % "2.1.0",
         "io.circe" %%% "circe-generic-extras" % Version.circe,
         "io.circe" %%% "circe-parser" % Version.circe
       )
