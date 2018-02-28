@@ -1,4 +1,4 @@
 Seq(
-  "org.scala-js"  % "sbt-scalajs"         % "0.6.21",
-  "com.lucidchart" % "sbt-scalafmt" % "1.15"
+  "com.geirsson" % "sbt-scalafmt" % "1.4.0",
+  "org.scala-js"  % "sbt-scalajs"         % "0.6.22"
 ).map(addSbtPlugin)
